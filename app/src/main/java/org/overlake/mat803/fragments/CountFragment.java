@@ -12,10 +12,14 @@ import androidx.fragment.app.Fragment;
 
 public class CountFragment extends Fragment {
 
+    public static final String COUNT = "count";
     private int mCount;
     private TextView mCountView;
     public static final String INITIAL_COUNT = "initial_count";
     public static final String REQUEST_KEY = "request_key";
+
+    public static CountFragment newInstance(int initialCount) {
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -41,6 +45,9 @@ public class CountFragment extends Fragment {
     public void increment() {
         mCount++;
         updateView();
+        Bundle bundle = new Bundle();
+        bundle.putInt(COUNT, mCount);
+        getParentFragmentManager().setFragmentResult(REQUEST_KEY, bundle);
     }
 
     public void updateView() {
