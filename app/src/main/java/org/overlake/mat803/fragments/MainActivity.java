@@ -6,29 +6,35 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentResultListener;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
+
+import org.overlake.mat803.fragments.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView mCountPhrase;
     public static final int INITIAL_COUNT = 5;
+    private FragmentManager mFragmentManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        mCountPhrase = findViewById(R.id.count_phrase);
-        FragmentManager fm = getSupportFragmentManager();
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+
+        setContentView(binding.getRoot());
+        mCountPhrase = binding.countPhrase;
+        mFragmentManager = getSupportFragmentManager();
         CountFragment fragment = CountFragment.newInstance(INITIAL_COUNT);
-        Bundle bundle = new Bundle();
-        bundle.putInt(CountFragment.INITIAL_COUNT, INITIAL_COUNT);
         updateView(INITIAL_COUNT);
 
-        fm.beginTransaction()
-                .add(R.id.fragmentContainerView, CountFragment.class, bundle)
+        mFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainerView, fragment)
+                .addToBackStack(null)
                 .commit();
 
 
-        fm.setFragmentResultListener(CountFragment.REQUEST_KEY, this, new FragmentResultListener() {
+        mFragmentManager.setFragmentResultListener(CountFragment.REQUEST_KEY, this, new FragmentResultListener() {
             @Override
             public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
                 updateView(result.getInt(CountFragment.COUNT));
@@ -39,5 +45,13 @@ public class MainActivity extends AppCompatActivity {
     private void updateView(int initialCount) {
         String msg = getResources().getString(R.string.count_phrase, initialCount);
         mCountPhrase.setText(msg);
+    }
+
+    public void next(View view) {
+        CountFragment fragment = CountFragment.newInstance();
+        mFragmentManager.beginTransaction()
+                .replace(R.id.fragmentContainerView, fragment)
+                .addToBackStack(null)
+                .commit();
     }
 }
